@@ -29,6 +29,16 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-10 w-10">
+                      <img :src="instance.icon" :class="instance.instanceType.includes('f1') ? 'bg-gray-800' : ''" class="h-10 w-10 rounded-full " alt="">
+                      <!-- <img  v-if="instance.name.toLowerCase().includes('fpga')" 
+                          class="h-10 w-10 rounded-full bg-gray-800" 
+                          src="https://www.ibv-augsburg.de/wp-content/uploads/2020/08/ibv_icon_firmwareentwicklung-fpga_01weiss.png" alt="" /> 
+                      <img  v-if="instance.name.toLowerCase().includes('gpu')" 
+                          class="h-10 w-10 rounded-full" 
+                          src="https://www.flaticon.es/svg/vstatic/svg/1088/1088744.svg?token=exp=1619653535~hmac=6de174fa15f3971bc5c38435f2df4c2b" alt="" /> 
+                      <img  v-if="instance.name.toLowerCase().includes('cpu')" 
+                          class="h-10 w-10 rounded-full" 
+                          src="https://cdn.icon-icons.com/icons2/1603/PNG/512/microchip-processor-chip-cpu_108630.png" alt="" />  -->
                       <!-- <img class="h-10 w-10 rounded-full" :src="person.image" alt="" /> -->
                     </div>
                     <div class="ml-4">
@@ -57,7 +67,10 @@
                   {{ instance.keyName }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                  <InstanceOptionsMenu :instance="instance" >
+
+                  </InstanceOptionsMenu>
+                  <!-- <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a> -->
                 </td>
               </tr>
             </tbody>
@@ -81,7 +94,26 @@ const people = [
   },
   // More people...
 ]
+const instanceTypes = [
+  {
+    "type": "fpga",
+    "awsTypes": ["f1"],
+    "icon": "https://www.ibv-augsburg.de/wp-content/uploads/2020/08/ibv_icon_firmwareentwicklung-fpga_01weiss.png"
+  },
+  {
+    "type": "gpu",
+    "awsTypes": ["g4dn", "p2", "p3"],
+    "icon": "https://www.flaticon.es/svg/vstatic/svg/1088/1088744.svg?token=exp=1619653535~hmac=6de174fa15f3971bc5c38435f2df4c2b"
+  },
+  {
+    "type": "cpu",
+    "awsTypes": ["t3", "t3a", "c5", "c5n"],
+    "icon": "https://cdn.icon-icons.com/icons2/1603/PNG/512/microchip-processor-chip-cpu_108630.png"
+  },
+];
 import axios from 'axios';
+
+import InstanceOptionsMenu from './InstanceOptionsMenu.vue';
 
 export class InstanceDetailDto {
   name;
@@ -93,6 +125,9 @@ export class InstanceDetailDto {
 
 export default {
   name: 'Table',
+  components: {
+    InstanceOptionsMenu,
+  },
   data() {
     return {
       instances: []
@@ -101,6 +136,7 @@ export default {
   setup() {
     return {
       people,
+      instanceTypes,
     }
   },
   mounted() {
@@ -110,8 +146,19 @@ export default {
     async fetchInstances(){
       let _self = this;
       axios.get("http://localhost:3000/ec2/instances/").then(res => {
-        _self.instances = res.data;
+        const data = res.data.map(entry =>  {
+          return {
+            ...entry,
+            icon: _self.icon(entry.instanceType)
+          }
+        });
+        console.log(data)
+        _self.instances = data;
       });
+    },
+    icon(instanceTypeName){
+      let instanceType = instanceTypeName.split('.')[0];
+      return this.instanceTypes.find((item) => item.awsTypes.includes(instanceType))?.icon;
     } 
   }
   

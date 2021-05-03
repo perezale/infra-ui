@@ -90,12 +90,13 @@
     <header class="bg-white shadow">
       <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <h1 class="text-3xl font-bold text-gray-900">
-          Dashboard
+          Instances
         </h1>
       </div>
     </header>
     <main>
       <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <TextFilter></TextFilter>
         <Table></Table>
       </div>
     </main>
@@ -107,6 +108,8 @@ import { ref } from 'vue'
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { BellIcon, MenuIcon, XIcon } from '@heroicons/vue/outline'
 import Table from './Table.vue'
+import TextFilter from './TextFilter.vue';
+
 
 const navigation = ['Dashboard', 'Team', 'Projects', 'Calendar', 'Reports']
 const profile = ['Your Profile', 'Settings', 'Sign out']
@@ -124,6 +127,7 @@ export default {
     MenuIcon,
     XIcon,
     Table,
+    TextFilter,
   },
   setup() {
     const open = ref(false)
